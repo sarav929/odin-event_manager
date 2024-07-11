@@ -19,6 +19,31 @@ def clean_phone(phone_number)
 end
 
 
+def registrations_per_hour(file, column_name)
+  registrations = []
+  CSV.foreach(file, headers: true, header_converters: :symbol) do |row|
+    time = row[column_name].split(" ")[1]
+    time_obj = DateTime.parse(time, "%H:%M")
+    registrations << time_obj.hour
+  end
+  return registrations
+end
+
+def registrations_per_wday(file, column_name)
+  registrations = []
+  CSV.foreach(file, headers:true, header_converters: :symbol) do |row|
+    date = row[column_name].split(" ")[0]
+    begin
+      date_obj = Date.parse(date)
+    rescue Date::Error
+      date_obj = Date.strptime(date, "%m/%d/%y")      
+    end
+    registrations << date_obj.strftime("%A")
+  end
+  return registrations
+end
+
+
 def legislators_by_zipcode(zip)
   civic_info = Google::Apis::CivicinfoV2::CivicInfoService.new
   civic_info.key = 'AIzaSyClRzDqDh5MsXwnCWi0kOiiBivP6JsSyBw'
