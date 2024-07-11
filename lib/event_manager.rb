@@ -18,7 +18,6 @@ def clean_phone(phone_number)
   end
 end
 
-
 def registrations_per_hour(file, column_name)
   registrations = []
   CSV.foreach(file, headers: true, header_converters: :symbol) do |row|
@@ -43,6 +42,33 @@ def registrations_per_wday(file, column_name)
   return registrations
 end
 
+def calculate_peak_hours(array)
+  count = Hash.new(0)
+  array.each do |el|
+    count[el] += 1
+  end
+
+  peak_hours = count.sort_by { |key, value| -value }[0..2]
+
+  puts "PEAK HOURS:"
+  peak_hours.each do |element, count|
+    puts "Hour: #{element}, Registrations: #{count}"
+  end
+
+end
+
+def calculate_peak_wday(array)
+  count = Hash.new(0)
+  array.each do |el|
+    count[el] += 1
+  end
+  peak_wday = count.max_by { |key, value| value }
+  puts "Peak weekday is #{peak_wday[0]} with #{peak_wday[1]} registrations."
+end
+
+calculate_peak_hours(registrations_per_hour("event_attendees.csv", :regdate))
+puts"\n"
+calculate_peak_wday(registrations_per_wday("event_attendees.csv", :regdate))
 
 def legislators_by_zipcode(zip)
   civic_info = Google::Apis::CivicinfoV2::CivicInfoService.new
